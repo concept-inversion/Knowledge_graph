@@ -21,3 +21,7 @@ merge(word2:Word{name:csvoutline.destination})
 with word1, word2, csvoutline
 CALL apoc.create.relationship(word1, csvoutline.relationshipType,{weight:csvoutline.distance}, word2) yield rel
 Return count(word1)
+
+
+// Query to match the words
+MATCH (n:Word)-[r]->(n2:Word) where n.name='fawn' RETURN n2,r.weight order by r.weight desc limit 5
