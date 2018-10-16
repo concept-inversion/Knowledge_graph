@@ -25,3 +25,30 @@ Return count(word1)
 
 // Query to match the words
 MATCH (n:Word)-[r]->(n2:Word) where n.name='fawn' RETURN n2,r.weight order by r.weight desc limit 5
+
+
+// neighbor nodes and total distance to each query words
+match(n:Word)-[r]->(n1:Word)-[r2]->(n2:Word) 
+where n1.name='pilot' AND n.name in ['captain','chair']
+return n.name as source,n2.name as destination,sum(r.weight+r2.weight) as total
+order by destination,total 
+
+// Minumum Spanning  Tree
+match (n:Word)-[r]->() where n.name in ['sofa','fawn']
+call algo.spanningTree.minimum('Word','RELATED','weight',id(n),{write:true, writeProperty:"MINST"})
+yield effectiveNodeCount
+return effectiveNodeCount;
+
+
+// Read MST Relationship
+match path = (n:Word)-[:MINST]->() where n.name in ['sofa','fawn']
+with relationships(path) as rels
+unwind rels as rel
+with distinct rel as rel
+Return startNode(rel).name as source, 
+endNode(rel).name as destination, rel.weight as cost
+
+// delete relationship
+MATCH p=()-[r:MINST]->() delete r
+
+
